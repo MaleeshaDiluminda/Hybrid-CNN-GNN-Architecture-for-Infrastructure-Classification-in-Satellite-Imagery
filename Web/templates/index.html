@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Infrastructure Classifier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="brand">InfraVision</div>
+    <div class="nav-links">
+      <a href="https://huggingface.co/spaces/maleeshalionel/Infravision/tree/main">Source Code</a>
+      <a href="#docs">Data</a>
+      <a href="#about">Medium</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h1>InfraVision</h1>
+      <p class="lead">Upload a satellite image and classify it as <strong>Infrastructure</strong> or <strong>Non-Infrastructure</strong> using the Hybrid CNN-GNN model.</p>
+
+      <!-- SIDEBAR NAVIGATION AND CONTENT LAYOUT -->
+      <div class="main-layout">
+        <!-- SIDEBAR -->
+        <nav class="sidebar" role="tablist" aria-label="Sections">
+          <button class="sidebar-btn active" data-tab="tab1" role="tab" aria-selected="true" aria-controls="tab1">
+            <span class="icon">🎯</span>
+            <span class="label">Predict</span>
+          </button>
+          <button class="sidebar-btn" data-tab="tab2" role="tab" aria-selected="false" aria-controls="tab2">
+            <span class="icon">📊</span>
+            <span class="label">Insights</span>
+          </button>
+          <button class="sidebar-btn" data-tab="tab3" role="tab" aria-selected="false" aria-controls="tab3">
+            <span class="icon">🔍</span>
+            <span class="label">Grad-CAM Gallery</span>
+          </button>
+          <button class="sidebar-btn" data-tab="tab4" role="tab" aria-selected="false" aria-controls="tab4">
+            <span class="icon">ℹ️</span>
+            <span class="label">Project Info</span>
+          </button>
+        </nav>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="content-area">
+          <!-- TAB PANELS -->
+          <section id="tab1" class="content-panel active" role="tabpanel" aria-labelledby="tab1">
+            <div class="panel-content">
+              <!-- Upload / Predict -->
+              <form action="/" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required>
+                <button class="primary" type="submit">Predict</button>
+              </form>
+
+              {% if error %}
+                <div class="result"><strong>Error:</strong> {{ error }}</div>
+              {% endif %}
+
+              {% if result %}
+                <div class="result">
+                  <div class="result-body">
+                    <div class="result-text">
+                      <h2 style="margin:.4rem 0 0.2rem 0;">{{ result.label }}</h2>
+                      <div>Probability Infrastructure:
+                        <strong>{{ "%.4f"|format(result.p_infrastructure) }}</strong>
+                      </div>
+                    </div>
+
+                    {% if result.image_data %}
+                    <div class="result-media">
+                      <img class="preview" src="data:image/jpeg;base64,{{ result.image_data }}" alt="Uploaded image preview"/>
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </section>
+
+          <section id="tab2" class="content-panel" role="tabpanel" aria-labelledby="tab2">
+            <div class="panel-content">
+              <!-- Metrics Table -->
+              <h3>Performance Summary</h3>
+              <table class="metrics-table">
+                <thead>
+                  <tr>
+                    <th>Metric</th>
+                    <th>CNN Baseline</th>
+                    <th>Hybrid CNN-GNN</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Accuracy</td><td>96.9%</td><td><strong>98.1%</strong></td></tr>
+                  <tr><td>F1-score</td><td>0.967</td><td><strong>0.979</strong></td></tr>
+                  <tr><td>ROC-AUC</td><td>0.993</td><td><strong>0.997</strong></td></tr>
+                  <tr><td>PR-AUC</td><td>0.987</td><td><strong>0.996</strong></td></tr>
+                  <tr><td>Brier Score</td><td>0.0220</td><td><strong>0.0160</strong></td></tr>
+                </tbody>
+              </table>
+
+              <!-- ROC & PR Curves -->
+              <h3>ROC & Precision-Recall Curves</h3>
+              <div class="insights-gallery">
+                <img src="/static/images/download6.png" alt="ROC Curve" />
+                <img src="/static/images/download7.png" alt="Precision-Recall Curve" />
+              </div>
+
+              <!-- Confusion Matrices -->
+              <h3>Confusion Matrices</h3>
+              <div class="insights-gallery">
+                <img src="/static/images/download5.png" alt="CNN Confusion Matrix" />
+                <img src="/static/images/download9.png" alt="Hybrid Confusion Matrix" />
+              </div>
+
+              <!-- Reliability Curve -->
+              <h3>Calibration & Reliability</h3>
+              <div class="insights-gallery single">
+                <img src="/static/images/download8.png" alt="Reliability Curve" />
+              </div>
+
+              <!-- Summary -->
+              <div class="summary">
+                <p>
+                  The Hybrid CNN-GNN model consistently outperforms the CNN baseline across accuracy, F1-score,
+                  and AUC metrics, demonstrating improved feature extraction and better spatial context learning.
+                  Grad-CAM heatmaps confirm enhanced interpretability, validating the hybrid approach.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section id="tab3" class="content-panel" role="tabpanel" aria-labelledby="tab3">
+            <div class="panel-content">
+              <!-- Grad-CAM Previews -->
+              <h3>Grad-CAM Visualizations</h3>
+              <div class="gradcam-gallery">
+                <img src="/static/images/download10.png" alt="Grad-CAM Example 1" />
+                <img src="/static/images/download11.png" alt="Grad-CAM Example 2" />
+                <img src="/static/images/download12.png" alt="Grad-CAM Example 3" />
+              </div>
+            </div>
+          </section>
+
+          <section id="tab4" class="content-panel" role="tabpanel" aria-labelledby="tab4">
+            <div class="panel-content">
+              <h2>InfraVision — What this does</h2>
+              <p class="muted">
+                InfraVision flags whether a satellite tile contains <strong>infrastructure</strong> or not.
+                It blends a ResNet-18 backbone with a lightweight <strong>GCN head</strong> over a 7×7 feature grid,
+                so it doesn't just see pixels — it reads <em>context</em> (roads next to roofs, patterns across blocks).
+              </p>
+
+              <h3>Why it's different</h3>
+              <ul>
+                <li><strong>Context-aware:</strong> Graph message passing captures spatial relationships a plain CNN can miss.</li>
+                <li><strong>Transparent:</strong> Built-in Grad-CAM shows <em>why</em> the model decided what it did.</li>
+                <li><strong>Trustworthy scores:</strong> Calibrated probabilities (Brier/ECE) instead of raw guesses.</li>
+                <li><strong>Practical:</strong> Simple Flask UI and REST endpoint for quick trials or integration.</li>
+              </ul>
+
+              <p class="muted" style="margin-top:10px;">
+                Built with PyTorch &amp; Flask. Trained on public land-use imagery (e.g., EuroSAT RGB) using a stratified
+                train/val/test split and standard augmentations. Metrics include Accuracy, F1, ROC-AUC, PR-AUC, and calibration.
+              </p>
+            </div>
+          </section>
+        </main>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
